@@ -1,4 +1,5 @@
 require 'sinatra'
+require 'pry'
 require 'line/bot'
 
 get '/' do
