@@ -4,9 +4,6 @@ require 'line/bot'
 require 'mechanize'
 
 
-get '/' do
-  "Hello world"
-end
 
 
 def client
@@ -22,7 +19,26 @@ def get_weather_of_osaka
   elements = page.search('.rain-probability td').inner_text
   string_array = elements.split('%')
   probability_array = string_array.map{ |s| s[/\d\d/] }
+  # ここの正規表現、[/\d+/]のが良さそう。
   probability_array[1]
+end
+
+get '/' do
+  if true #(Time.now.hour == 23 && Time.now.min == 0)
+   toMe = ENV["MY_ID"]
+   request_content = {
+           to: [toMe],
+           toChannel: 1383378250, # Fixed  value
+           eventType: "138311608800106203", # Fixed value
+           content: {contentType: 1,
+                     toType: 1,
+                     text: "おはよう"
+                    }
+         }
+   request_content_json = request_content.to_json
+   RestClient.proxy = ENV["FIXIE_URL"]
+   RestClient.post(@endpoint_uri,request_content_json,@request_header)
+  end
 end
 
 
