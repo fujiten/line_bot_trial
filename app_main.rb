@@ -23,7 +23,8 @@ def fetch_rainy_percent_of_osaka
 end
 
 get '/' do
-  if rainy = fetch_rainy_percent_of_osaka > 40
+  rainy = fetch_rainy_percent_of_osaka
+  if rainy > 40
     push_content = {
       type: 'text',
       text: "明日の降水確率は#{rainy}%です。傘を持っていったほうがいいかもね。",
