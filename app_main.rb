@@ -13,13 +13,13 @@ def client
   }
 end
 
-def get_weather_of_osaka
+def fetch_rainy_percent_of_osaka
   agent = Mechanize.new
   page = agent.get('https://tenki.jp/forecast/6/30/6200/27100/')
   elements = page.search('.rain-probability td').inner_text
   string_array = elements.split('%')
   probability_array = string_array.map{ |s| s[/\d+/] }
-  probability_array[1]
+  probability_array[1].to_i
 end
 
 get '/' do
@@ -27,7 +27,7 @@ get '/' do
     # toMe = ENV["MY_ID"]
     push_content = {
       type: 'text',
-      text: "おはよう",
+      text: "明日は#{fetch_rainy_percent_of_osaka}の確率で雨が降りるかもしれません。",
     }
     user_id = "U1ccc5e7afdc77a70d9d7b7fb52235091"
     response = client.push_message(user_id, push_content)
@@ -53,7 +53,7 @@ post '/callback' do
         if text_params =~ /天気/
           message = {
             type: 'text',
-            text: "明日の降水確率は#{get_weather_of_osaka}%です。"
+            text: "明日の降水確率は#{fetch_rainy_percent_of_osaka}%です。"
           }
           client.reply_message(event['replyToken'], message)
         else
