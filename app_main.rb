@@ -23,11 +23,15 @@ def fetch_rainy_percent_of_osaka
 end
 
 get '/' do
-  if true #(Time.now.hour == 23 && Time.now.min == 0)
-    # toMe = ENV["MY_ID"]
+  if rainy = fetch_rainy_percent_of_osaka > 40
     push_content = {
       type: 'text',
-      text: "明日は#{fetch_rainy_percent_of_osaka}の確率で雨が降りるかもしれません。",
+      text: "明日の降水確率は#{rainy}%です。傘を持っていったほうがいいかもね。",
+    }
+  else
+    push_content = {
+      type: 'text',
+      text: "明日の降水確率は#{rainy}%です。傘はいらなそうだね。",
     }
     user_id = "U1ccc5e7afdc77a70d9d7b7fb52235091"
     response = client.push_message(user_id, push_content)
