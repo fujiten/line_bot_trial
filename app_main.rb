@@ -22,6 +22,20 @@ def fetch_rainy_percent_of_osaka
   probability_array[1].to_i
 end
 
+def fetch_top_access_of_news
+  news = {}
+  agent = Mechanize.new
+  page = agent.get('https://news.yahoo.co.jp/')
+  elements = page.at('.yjnSub_list_wrap a')
+  link = elements.get_attribute('href')
+  title = elements.at('.yjnSub_list_head').inner_text
+  source = elements.at('.yjnSub_list_source span').inner_text
+  news[:link] = link
+  news[:title] = title
+  news[:source] = source
+  news
+end
+
 get '/' do
   rainy = fetch_rainy_percent_of_osaka
   if rainy > 40
@@ -59,6 +73,14 @@ post '/callback' do
           message = {
             type: 'text',
             text: "明日の降水確率は#{fetch_rainy_percent_of_osaka}%です。"
+          }
+          client.reply_message(event['replyToken'], message)
+        elsif text_params =~ /ニュース/
+          news = fetch_top_access_of_news
+          message = {
+            type: 'text',
+            text: "今日のトップニュースは「#{news[:title]}」です。
+            詳細は#{news[:link]}へどうぞ。（情報元：#{news[:source]}）"
           }
           client.reply_message(event['replyToken'], message)
         else
