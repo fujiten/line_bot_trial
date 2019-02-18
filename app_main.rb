@@ -48,7 +48,7 @@ get '/' do
       type: 'text',
       text: "今日の降水確率は#{rainy}%です。傘はいらなそうだね。",
     }
-    user_id = "U1ccc5e7afdc77a70d9d7b7fb52235091"
+    user_id = ENV["MY_USER_ID"]
     response = client.push_message(user_id, push_content)
   end
 end
