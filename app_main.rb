@@ -38,15 +38,15 @@ end
 
 get '/' do
   rainy = fetch_rainy_percent_of_osaka
-  if rainy > 40
+  if rainy > 30
     push_content = {
       type: 'text',
-      text: "明日の降水確率は#{rainy}%です。傘を持っていったほうがいいかもね。",
+      text: "今日の降水確率は#{rainy}%です。傘を持っていったほうがいいかもね。",
     }
   else
     push_content = {
       type: 'text',
-      text: "明日の降水確率は#{rainy}%です。傘はいらなそうだね。",
+      text: "今日の降水確率は#{rainy}%です。傘はいらなそうだね。",
     }
     user_id = "U1ccc5e7afdc77a70d9d7b7fb52235091"
     response = client.push_message(user_id, push_content)
