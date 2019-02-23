@@ -1,0 +1,14 @@
+development:
+  adapter: postgresql
+  encoding: unicode
+  database: line_bot_development
+  pool: 5
+
+production:
+  encoding: unicode
+  adapter: postgresql
+  username: user_name
+  port: port
+  host: host
+  database: database
+  password: password

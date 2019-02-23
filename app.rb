@@ -1,16 +1,11 @@
 require 'sinatra'
+require "sinatra/activerecord"
 require 'pry-byebug'
 require 'line/bot'
 require 'mechanize'
-require 'active_record'
 require 'pg'
 
-ActiveRecord::Base.configurations = YAML.load_file('database.yml')
-ActiveRecord::Base.establish_connection('development')
-
-class User < ActiveRecord::Base
-end
-
+set :database, {adapter: "postgresql", database: "line_bot_development"}
 
 def client
   @client ||= Line::Bot::Client.new { |config|
@@ -106,4 +101,18 @@ post '/callback' do
     end
   }
   "OK"
+end
+
+class User < ActiveRecord::Base
+  validates_presence_of :name
+end
+
+get '/users' do
+  user = User.find(1)
+  user.name
+end
+
+get '/users/create' do
+  user = User.new(name: 'test1')
+  user.save
 end

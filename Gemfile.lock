@@ -13,6 +13,7 @@ GEM
       minitest (~> 5.1)
       tzinfo (~> 1.1)
     arel (9.0.0)
+    backports (3.12.0)
     byebug (10.0.2)
     coderay (1.1.2)
     concurrent-ruby (1.1.4)
@@ -39,6 +40,7 @@ GEM
     mime-types-data (3.2018.0812)
     mini_portile2 (2.4.0)
     minitest (5.11.3)
+    multi_json (1.13.1)
     mustermann (1.0.3)
     net-http-digest_auth (1.4.1)
     net-http-persistent (3.0.0)
@@ -62,6 +64,18 @@ GEM
       rack (~> 2.0)
       rack-protection (= 2.0.5)
       tilt (~> 2.0)
+    sinatra-activerecord (2.0.13)
+      activerecord (>= 3.2)
+      sinatra (>= 1.0)
+    sinatra-contrib (2.0.5)
+      backports (>= 2.8.2)
+      multi_json
+      mustermann (~> 1.0)
+      rack-protection (= 2.0.5)
+      sinatra (= 2.0.5)
+      tilt (>= 1.3, < 3)
+    sinatra-reloader (1.0)
+      sinatra-contrib
     thread_safe (0.3.6)
     tilt (2.0.9)
     tzinfo (1.2.5)
@@ -75,13 +89,14 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  activerecord
   line-bot-api
   mechanize
   pg
   pry-byebug
   rake
   sinatra
+  sinatra-activerecord
+  sinatra-reloader
 
 BUNDLED WITH
    1.16.1
