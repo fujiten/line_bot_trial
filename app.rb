@@ -1,10 +1,11 @@
 require 'sinatra'
+require "sinatra/activerecord"
 require 'pry-byebug'
 require 'line/bot'
 require 'mechanize'
+require 'pg'
 
-
-
+set :database, {adapter: "postgresql", database: "line_bot_development"}
 
 def client
   @client ||= Line::Bot::Client.new { |config|
@@ -37,20 +38,22 @@ def fetch_top_access_of_news
 end
 
 get '/' do
-  rainy = fetch_rainy_percent_of_osaka
-  if rainy > 30
-    push_content = {
-      type: 'text',
-      text: "今日の降水確率は#{rainy}%です。傘を持っていったほうがいいかもね。",
-    }
-  else
-    push_content = {
-      type: 'text',
-      text: "今日の降水確率は#{rainy}%です。傘はいらなそうだね。",
-    }
-    user_id = ENV["MY_USER_ID"]
-    response = client.push_message(user_id, push_content)
-  end
+  user = User.new
+  user.name
+  # rainy = fetch_rainy_percent_of_osaka
+  # if rainy > 30
+  #   push_content = {
+  #     type: 'text',
+  #     text: "今日の降水確率は#{rainy}%です。傘を持っていったほうがいいかもね。",
+  #   }
+  # else
+  #   push_content = {
+  #     type: 'text',
+  #     text: "今日の降水確率は#{rainy}%です。傘はいらなそうだね。",
+  #   }
+  #   user_id = ENV["MY_USER_ID"]
+  #   response = client.push_message(user_id, push_content)
+  # end
 end
 
 
@@ -98,4 +101,18 @@ post '/callback' do
     end
   }
   "OK"
+end
+
+class User < ActiveRecord::Base
+  validates_presence_of :name
+end
+
+get '/users' do
+  user = User.find(1)
+  user.name
+end
+
+get '/users/create' do
+  user = User.new(name: 'test1')
+  user.save
 end
