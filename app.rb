@@ -4,6 +4,7 @@ require 'pry-byebug'
 require 'line/bot'
 require 'mechanize'
 require 'pg'
+require './whether.rb'
 
 set :database, {adapter: "postgresql", database: "line_bot_development"}
 
@@ -73,9 +74,13 @@ post '/callback' do
       case event.type
       when Line::Bot::Event::MessageType::Text
         if text_params =~ /天気/
+          whether = Whether.new
+          url = "http://weather.livedoor.com/forecast/webservice/json/v1?city=130010"
+          hash_response = whether.fetch_whether_from(url)
+          whether.set_todays_whether(hash_response)
           message = {
             type: 'text',
-            text: "明日の降水確率は#{fetch_rainy_percent_of_osaka}%です。"
+            text: "#{whether.datelabel}の天気は#{whether.telop}です。"
           }
           client.reply_message(event['replyToken'], message)
         elsif text_params =~ /ニュース/
