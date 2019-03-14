@@ -18,6 +18,8 @@ class Whether
     @telop = today_whether["telop"]
   end
 
+
+
 end
 
 # whether = Whether.new
