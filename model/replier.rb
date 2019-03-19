@@ -37,11 +37,12 @@ class Replier
             }
             client.reply_message(event['replyToken'], message)
           elsif text_params =~ /ニュース/
-            news = fetch_top_access_of_news
+            news = News.new
+            news_info = news.fetch_top_access_of_news
             message = {
               type: 'text',
-              text: "今日のトップニュースは「#{news[:title]}」です。
-              詳細は#{news[:link]}へどうぞ。（情報元：#{news[:source]}）"
+              text: "今日のトップニュースは「#{news_info[:title]}」です。
+              詳細は#{news_info[:link]}へどうぞ。（情報元：#{news_info[:source]}）"
             }
             client.reply_message(event['replyToken'], message)
           else
