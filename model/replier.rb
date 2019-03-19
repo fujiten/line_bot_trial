@@ -6,13 +6,6 @@ class Replier
     @request_body = request.body.read
   end
 
-  def client
-    client ||= Line::Bot::Client.new { |config|
-      config.channel_secret = ENV["LINE_CHANNEL_SECRET"]
-      config.channel_token = ENV["LINE_CHANNEL_TOKEN"]
-    }
-  end
-
   def validate_of(request)
     signature = request.env['HTTP_X_LINE_SIGNATURE']
     client.validate_signature(request_body, signature)
@@ -27,6 +20,11 @@ class Replier
         case event.type
         when Line::Bot::Event::MessageType::Text
           if text_params =~ /天気/
+
+
+
+
+
             whether = Whether.new
             url = "http://weather.livedoor.com/forecast/webservice/json/v1?city=130010"
             hash_response = whether.fetch_whether_from(url)
@@ -60,4 +58,14 @@ class Replier
       end
     }
   end
+
+  private
+
+  def client
+    client ||= Line::Bot::Client.new { |config|
+      config.channel_secret = ENV["LINE_CHANNEL_SECRET"]
+      config.channel_token = ENV["LINE_CHANNEL_TOKEN"]
+    }
+  end
+
 end
