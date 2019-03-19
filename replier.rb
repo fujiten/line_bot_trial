@@ -1,9 +1,9 @@
 class Replier
-  attr_accessor :request, :body
+  attr_accessor :request, :request_body
 
   def initialize(request)
     @request = request
-    @body = request.body.read
+    @request_body = request.body.read
   end
 
   def client
@@ -15,11 +15,11 @@ class Replier
 
   def validate_of(request)
     signature = request.env['HTTP_X_LINE_SIGNATURE']
-    client.validate_signature(body, signature)
+    client.validate_signature(request_body, signature)
   end
 
-  def reply_message_according_to(body)
-    events = client.parse_events_from(body)
+  def reply_message_according_to(request_body)
+    events = client.parse_events_from(request_body)
     text_params = events[0]["message"]["text"]
     events.each { |event|
       case event
