@@ -17,11 +17,13 @@ ActiveRecord::Schema.define(version: 2019_03_13_154444) do
 
   create_table "cities", force: :cascade do |t|
     t.string "name"
-    t.integer "number"
+    t.string "string_number"
   end
 
   create_table "users", force: :cascade do |t|
-    t.string "name"
+    t.string "uid"
+    t.string "status", default: "0"
+    t.string "name", default: "ご新規さん"
   end
 
 end
