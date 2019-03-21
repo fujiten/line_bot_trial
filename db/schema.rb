@@ -17,7 +17,7 @@ ActiveRecord::Schema.define(version: 2019_03_13_154444) do
 
   create_table "cities", force: :cascade do |t|
     t.string "name"
-    t.integer "number"
+    t.string "string_number"
   end
 
   create_table "users", force: :cascade do |t|
