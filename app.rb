@@ -10,6 +10,9 @@ set :database, {adapter: "postgresql", database: "line_bot_development"}
 
 post '/callback' do
 
+  #本番環境では削除する
+  load "./model/replier.rb"
+
   replier = Replier.new(request)
 
   unless replier.validate_of(replier.request)
@@ -21,6 +24,7 @@ post '/callback' do
 end
 
 get '/whether' do
+
   city = City.find(3)
   city.name
 end

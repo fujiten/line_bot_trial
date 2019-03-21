@@ -13,7 +13,12 @@ class Replier
 
   def reply_message_according_to(request_body)
     events = client.parse_events_from(request_body)
+    user = create_user_or_find_user_from(events)
+
+
+
     text_params = events[0]["message"]["text"]
+
     events.each { |event|
       case event
       when Line::Bot::Event::Message
@@ -46,7 +51,7 @@ class Replier
           else
             message = {
               type: 'text',
-              text: event.message['text'] + "…って、どういう意味ですか？"
+              text: event.message['text'] + "…って、どういう意味ですか？" + user.status
             }
             client.reply_message(event['replyToken'], message)
           end
@@ -66,6 +71,21 @@ class Replier
       config.channel_secret = ENV["LINE_CHANNEL_SECRET"]
       config.channel_token = ENV["LINE_CHANNEL_TOKEN"]
     }
+  end
+
+  def create_user_or_find_user_from(events)
+    user_id = events[0]["source"]["userId"]
+    user = User.find_by(uid: user_id)
+    unless user
+      user = User.new(uid: user_id)
+      if user.save
+        user
+      else
+        #エラー時の処理は後に書く. 今は"400"を返しておく
+        user = "400"
+      end
+    end
+    user
   end
 
 end
