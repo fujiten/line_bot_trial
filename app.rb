@@ -12,6 +12,7 @@ post '/callback' do
 
   #本番環境では削除する
   load "./model/replier.rb"
+  load "./model/whether.rb"
 
   replier = Replier.new(request)
 

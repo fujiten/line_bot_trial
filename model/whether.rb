@@ -5,7 +5,19 @@ require 'json'
 class Whether
   attr_accessor :datelabel, :telop
 
-  def fetch_whether_from(url)
+
+  def self.create_message_about_whether_in(city)
+    url = "http://weather.livedoor.com/forecast/webservice/json/v1?city=#{city.string_number}"
+    hash_response = Whether.fetch_whether_from(url)
+    whether = Whether.new
+    whether.set_todays_whether(hash_response)
+    message = {
+      type: 'text',
+      text: "[対話状態：天気]\n#{city.name}の#{whether.datelabel}の天気は#{whether.telop}だよ。"
+    }
+  end
+
+  def self.fetch_whether_from(url)
     uri = URI.parse(url)
     res = Net::HTTP.get(uri)
     hash_res = JSON.parse(res)
