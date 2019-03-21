@@ -6,11 +6,21 @@ require 'line/bot'
 require 'pg'
 require './model/application_model'
 
-set :database, {adapter: "postgresql", database: "line_bot_development"}
+# set :database, {adapter: "postgresql", }
+
+configure :development do
+  set :database, {adapter: 'postgresql', database: "line_bot_development"}
+end
+
+configure :production do
+  set :database, {adapter: 'postgresql', database: "line_bot_production"}
+end
+
+# ActiveRecord::Base.establish_connection(ENV['DATABASE_URL'] )
 
 post '/callback' do
 
-  #本番環境では削除する
+  #本番環境ではコメントアウトする
   load "./model/replier.rb"
   load "./model/whether.rb"
 
