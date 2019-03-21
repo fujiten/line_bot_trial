@@ -13,7 +13,7 @@ configure :development do
 end
 
 configure :production do
-  set :database, {adapter: 'postgresql', database: "line_bot_production"}
+    ActiveRecord::Base.establish_connection(ENV['DATABASE_URL'] || 'postgres://localhost/mydb')
 end
 
 # ActiveRecord::Base.establish_connection(ENV['DATABASE_URL'] )
