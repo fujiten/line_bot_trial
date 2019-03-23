@@ -13,7 +13,7 @@ class Whether
     whether.set_todays_whether(hash_response)
     message = {
       type: 'text',
-      text: "[対話状態：天気]\n#{city.name}の#{whether.datelabel}の天気は#{whether.telop}だよ。"
+      text: "[状態：天気検索]\n#{city.name}の#{whether.datelabel}の天気は#{whether.telop}だよ。"
     }
   end
 

@@ -20,11 +20,13 @@ GEM
     connection_pool (2.2.2)
     domain_name (0.5.20180417)
       unf (>= 0.0.5, < 1.0.0)
+    ffi (1.10.0)
     http-cookie (1.0.3)
       domain_name (~> 0.5)
     i18n (1.5.3)
       concurrent-ruby (~> 1.0)
     line-bot-api (1.5.1)
+    mecab (0.996)
     mechanize (2.7.6)
       domain_name (~> 0.5, >= 0.5.1)
       http-cookie (~> 1.0)
@@ -42,6 +44,8 @@ GEM
     minitest (5.11.3)
     multi_json (1.13.1)
     mustermann (1.0.3)
+    natto (1.1.2)
+      ffi (>= 1.9.0)
     net-http-digest_auth (1.4.1)
     net-http-persistent (3.0.0)
       connection_pool (~> 2.2)
@@ -90,7 +94,9 @@ PLATFORMS
 
 DEPENDENCIES
   line-bot-api
+  mecab (= 0.996)
   mechanize
+  natto
   pg
   pry-byebug
   rake
