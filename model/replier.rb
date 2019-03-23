@@ -31,17 +31,31 @@ class Replier
     status = user.status
 
     if status == "天気"
-      city = City.where('name LIKE ?', "%#{text_params}%")
-      if city.empty?
+      analized_words = generate_analized_words_from(text_params)
+      region_arr = extract_region_word_from(analized_words)
+
+      if region_arr.empty?
         message = {
           type: 'text',
-          text: "[状態：解読不能]\nごめん、市町村名だけで教えてくれない？ 例えば「大阪」みたいに。"
+          text: "[状態：天気検索]\n「大阪」みたいに地域名を教えてほしいんだ。興味ないなら「戻る」って言ってね。"
         }
-        client.reply_message(events[0]['replyToken'], message)
+      elsif region_arr.length > 1
+        message = {
+          type: 'text',
+          text: "[エラー：複数の地域]\n一度にたくさんの地域を言われると分析できないんだよね。気を使ってほしいな。"
+        }
       else
-        message = Whether.create_message_about_whether_in(city[0])
-        client.reply_message(events[0]['replyToken'], message)
+        city = City.find_by(name: region_arr[0])
+        if city.nil?
+          message = {
+            type: 'text',
+            text: "[エラー：サポート範囲外]\n#{region_arr[0]}の天気はちょっとわかんないなあ…。ごめんね。"
+          }
+        else
+          message = Whether.create_message_about_whether_in(city)
+        end
       end
+      client.reply_message(events[0]['replyToken'], message)
     end
 
 
@@ -58,7 +72,7 @@ class Replier
               user.save
               message = {
                 type: 'text',
-                text: "[対話状態：天気] \n今日の天気を教えてあげるよ。聞いてみて？"
+                text: "[状態：天気検索] \n今日の天気を調べるよ。知りたい場所を入力してみて。"
               }
               client.reply_message(event['replyToken'], message)
 
@@ -74,7 +88,7 @@ class Replier
             else
               message = {
                 type: 'text',
-                text: "[状態：待機]\n" + event.message['text'] + "…って、どういう意味？" + user.name
+                text: "[状態：待機中]\n" + event.message['text'] + "…って、どういう意味？"
               }
               client.reply_message(event['replyToken'], message)
             end
@@ -111,6 +125,28 @@ class Replier
       end
     end
     user
+  end
+
+  def generate_analized_words_from(text)
+    arr = []
+    natto = Natto::MeCab.new
+    natto.parse(text) do |n|
+      arr << {n.surface => n.feature.split(",")}
+    end
+    arr
+  end
+
+  def extract_region_word_from(text_array)
+    region_arr = []
+
+    text_array.each do |hash|
+      hash.each do |k, v|
+        if v[2] == "地域"
+          region_arr << k
+        end
+      end
+    end
+    region_arr
   end
 
 end
