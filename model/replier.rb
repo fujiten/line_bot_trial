@@ -74,6 +74,21 @@ class Replier
                 type: 'text',
                 text: "[状態：天気検索] \n今日の天気を調べるよ。知りたい場所を入力してみて。"
               }
+            elsif text_params =~ /たたかう/
+              template = {
+                type: 'confirm',
+                text: 'テキストメッセージ。最大240文字',
+                actions: [
+                           { type: 'message', label: 'yes', text: 'yesを押しました' },
+                           { type: 'message', label: 'no',  text: 'noを押しました' }
+                           ]
+                }
+
+              message = {
+                type: 'template',
+                text: '代替テキスト',
+                template: template
+              };
             elsif text_params =~ /ニュース/
               news = News.new
               news_info = news.fetch_top_access_of_news
