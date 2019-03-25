@@ -74,8 +74,6 @@ class Replier
                 type: 'text',
                 text: "[状態：天気検索] \n今日の天気を調べるよ。知りたい場所を入力してみて。"
               }
-              client.reply_message(event['replyToken'], message)
-
             elsif text_params =~ /ニュース/
               news = News.new
               news_info = news.fetch_top_access_of_news
@@ -84,14 +82,13 @@ class Replier
                 text: "今日のトップニュースは「#{news_info[:title]}」です。
                 詳細は#{news_info[:link]}へどうぞ。（情報元：#{news_info[:source]}）"
               }
-              client.reply_message(event['replyToken'], message)
             else
               message = {
                 type: 'text',
                 text: "[状態：待機中]\n" + event.message['text'] + "…って、どういう意味？"
               }
-              client.reply_message(event['replyToken'], message)
             end
+            client.reply_message(event['replyToken'], message)
           when Line::Bot::Event::MessageType::Image, Line::Bot::Event::MessageType::Video
             response = client.get_message_content(event.message['id'])
             tf = Tempfile.open("content")
