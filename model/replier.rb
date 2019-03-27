@@ -15,103 +15,123 @@ class Replier
     events = client.parse_events_from(request_body)
     user = create_or_find_user_from(events)
 
-    text_params = events[0]["message"]["text"]
 
-    if text_params =~ /戻る/
-      user.status = "0"
-      user.save
-      message = {
-        type: 'text',
-        text: "[状態：待機]\n待機状態に戻るね。"
-      }
-      client.reply_message(events[0]['replyToken'], message)
-    end
+    postback_params = events[0]["postback"]
+    unless postback_params
 
+      text_params = events[0]["message"]["text"]
 
-    status = user.status
-
-    if status == "天気"
-      analized_words = generate_analized_words_from(text_params)
-      region_arr = extract_region_word_from(analized_words)
-
-      if region_arr.empty?
+      if text_params =~ /戻る/
+        user.status = "0"
+        user.save
         message = {
           type: 'text',
-          text: "[状態：天気検索]\n「大阪」みたいに地域名を教えてほしいんだ。興味ないなら「戻る」って言ってね。"
+          text: "[状態：待機]\n待機状態に戻るね。"
         }
-      elsif region_arr.length > 1
-        message = {
-          type: 'text',
-          text: "[エラー：複数の地域]\n一度にたくさんの地域を言われると分析できないんだよね。気を使ってほしいな。"
-        }
-      else
-        city = City.find_by(name: region_arr[0])
-        if city.nil?
+        client.reply_message(events[0]['replyToken'], message)
+      end
+
+
+      status = user.status
+
+      if status == "天気"
+        analized_words = generate_analized_words_from(text_params)
+        region_arr = extract_region_word_from(analized_words)
+
+        if region_arr.empty?
           message = {
             type: 'text',
-            text: "[エラー：サポート範囲外]\n#{region_arr[0]}の天気はちょっとわかんないなあ…。ごめんね。"
+            text: "[状態：天気検索]\n「大阪」みたいに地域名を教えてほしいんだ。興味ないなら「戻る」って言ってね。"
+          }
+        elsif region_arr.length > 1
+          message = {
+            type: 'text',
+            text: "[エラー：複数の地域]\n一度にたくさんの地域を言われると分析できないんだよね。気を使ってほしいな。"
           }
         else
-          message = Whether.create_message_about_whether_in(city)
-        end
-      end
-      client.reply_message(events[0]['replyToken'], message)
-    end
-
-
-
-    if status == "0"
-      events.each { |event|
-        case event
-        when Line::Bot::Event::Message
-          case event.type
-          when Line::Bot::Event::MessageType::Text
-            if text_params =~ /天気/
-              status = "天気"
-              user.status = status
-              user.save
-              message = {
-                type: 'text',
-                text: "[状態：天気検索] \n今日の天気を調べるよ。知りたい場所を入力してみて。"
-              }
-            elsif text_params =~ /たたかう/
-              template = {
-                type: 'confirm',
-                text: 'テキストメッセージ。最大240文字',
-                actions: [
-                           { type: 'message', label: 'yes', text: 'yesを押しました' },
-                           { type: 'message', label: 'no',  text: 'noを押しました' }
-                           ]
-                }
-
-              message = {
-                type: 'template',
-                text: '代替テキスト',
-                template: template
-              };
-            elsif text_params =~ /ニュース/
-              news = News.new
-              news_info = news.fetch_top_access_of_news
-              message = {
-                type: 'text',
-                text: "今日のトップニュースは「#{news_info[:title]}」です。
-                詳細は#{news_info[:link]}へどうぞ。（情報元：#{news_info[:source]}）"
-              }
-            else
-              message = {
-                type: 'text',
-                text: "[状態：待機中]\n" + event.message['text'] + "…って、どういう意味？"
-              }
-            end
-            client.reply_message(event['replyToken'], message)
-          when Line::Bot::Event::MessageType::Image, Line::Bot::Event::MessageType::Video
-            response = client.get_message_content(event.message['id'])
-            tf = Tempfile.open("content")
-            tf.write(response.body)
+          city = City.find_by(name: region_arr[0])
+          if city.nil?
+            message = {
+              type: 'text',
+              text: "[エラー：サポート範囲外]\n#{region_arr[0]}の天気はちょっとわかんないなあ…。ごめんね。"
+            }
+          else
+            message = Whether.create_message_about_whether_in(city)
           end
         end
-      }
+        client.reply_message(events[0]['replyToken'], message)
+      end
+
+
+
+      if status == "0"
+        events.each { |event|
+          case event
+          when Line::Bot::Event::Message
+            case event.type
+            when Line::Bot::Event::MessageType::Text
+              if text_params =~ /天気/
+                status = "天気"
+                user.status = status
+                user.save
+                message = {
+                  type: 'text',
+                  text: "[状態：天気検索] \n今日の天気を調べるよ。知りたい場所を入力してみて。"
+                }
+              elsif text_params =~ /スライム/
+                template = {
+                  type: 'buttons',
+                  text: 'スライムがあらわれた！',
+                  thumbnailImageUrl: 'https://item-shopping.c.yimg.jp/i/j/fishingcat_5958',
+                  actions: [
+                             { type: "postback", label: 'たたかう', data: 'たたかう' },
+                             { type: 'postback', label: 'にげる',  data: 'にげる' }
+                             ]
+                  }
+                message = {
+                  type: 'template',
+                  altText: '代替テキスト',
+                  template: template
+                }
+              elsif text_params =~ /ニュース/
+                news = News.new
+                news_info = news.fetch_top_access_of_news
+                message = {
+                  type: 'text',
+                  text: "今日のトップニュースは「#{news_info[:title]}」です。
+                  詳細は#{news_info[:link]}へどうぞ。（情報元：#{news_info[:source]}）"
+                }
+              else
+                message = {
+                  type: 'text',
+                  text: "[状態：待機中]\n#{event.message['text']}…って、どういう意味？",
+                  quickReply: BattleChoice.create_quick_reply_object
+                }
+              end
+              client.reply_message(event['replyToken'], message)
+            when Line::Bot::Event::MessageType::Image, Line::Bot::Event::MessageType::Video
+              response = client.get_message_content(event.message['id'])
+              tf = Tempfile.open("content")
+              tf.write(response.body)
+            end
+          end
+        }
+      end
+    else
+      data_params = postback_params["data"]
+      if data_params == 'たたかう'
+        message = {
+          type: 'text',
+          text: "[状態：戦闘開始！]",
+          quickReply: BattleChoice.create_quick_reply_object
+        }
+        client.reply_message(events[0]['replyToken'], message)
+
+      elsif data_params == 'にげる'
+
+      end
     end
+
 
   end
 
