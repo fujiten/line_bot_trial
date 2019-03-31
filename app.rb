@@ -22,8 +22,11 @@ end
 post '/callback' do
 
   #本番環境ではコメントアウトする
+
   load "./model/replier.rb"
   load "./model/whether.rb"
+  load "./model/news.rb"
+  load "./model/battle_choice.rb"
 
   replier = Replier.new(request)
 
