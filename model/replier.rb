@@ -35,30 +35,7 @@ class Replier
       status = user.status
 
       if status == "天気"
-        analized_words = generate_analized_words_from(text_params)
-        region_arr = extract_region_word_from(analized_words)
-
-        if region_arr.empty?
-          message = {
-            type: 'text',
-            text: "[状態：天気検索]\n「大阪」みたいに地域名を教えてほしいんだ。興味ないなら「戻る」って言ってね。"
-          }
-        elsif region_arr.length > 1
-          message = {
-            type: 'text',
-            text: "[エラー：複数の地域]\n一度にたくさんの地域を言われると分析できないんだよね。気を使ってほしいな。"
-          }
-        else
-          city = City.find_by(name: region_arr[0])
-          if city.nil?
-            message = {
-              type: 'text',
-              text: "[エラー：サポート範囲外]\n#{region_arr[0]}の天気はちょっとわかんないなあ…。ごめんね。"
-            }
-          else
-            message = Whether.create_message_about_whether_in(city)
-          end
-        end
+        message = Whether.create_message_about_whether_in(text_params)
         client.reply_message(events[0]['replyToken'], message)
       end
 
@@ -74,8 +51,7 @@ class Replier
 
       if status == "0"
         if text_params =~ /天気/
-          status = "天気"
-          user.status = status
+          user.status = "天気"
           user.save
           message = {
             type: 'text',
