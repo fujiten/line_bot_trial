@@ -40,23 +40,9 @@ end
 
 get '/whether' do
 
-  word = "東京と大阪では静岡形態素解析を旭川と行った研究は当たり前だよ。ニューヨーク"
-  arr = []
-
-  natto = Natto::MeCab.new
-  natto.parse(word) do |n|
-    arr << {n.surface => n.feature.split(",")}
-  end
-
-  region_arr = []
-
-  arr.each do |hash|
-    hash.each do |k, v|
-      if v[2] == "地域"
-        word << k
-      end
-    end
-  end
-  region_arr
+  load "./model/brain.rb"
+  brain = Brain.new("こんにちは、明日の大阪はどんな日になるだろう")
+  word = brain.generate_analized_array_words
+  word.inspect
 
 end
