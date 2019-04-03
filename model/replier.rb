@@ -1,9 +1,15 @@
 class Replier
-  attr_accessor :request, :request_body
+  attr_accessor :request, :client, :request_body,
+                :user, :events, :text_params, :postback_params
 
   def initialize(request)
     @request = request
+    @client ||= set_client
     @request_body = request.body.read
+    @events = client.parse_events_from(request_body)
+    @user = create_or_find_user_from(events)
+    @postback_params ||= events[0]["postback"]
+    @text_params ||= events[0]["message"]["text"] unless @postback_params
   end
 
   def validate_of(request)
@@ -11,15 +17,24 @@ class Replier
     client.validate_signature(request_body, signature)
   end
 
-  def reply_message_according_to(request_body)
-    events = client.parse_events_from(request_body)
-    user = create_or_find_user_from(events)
+  def reply_message
 
+    if postback_params
+      data_params = postback_params["data"]
+      if data_params == 'たたかう'
+        user.status = "fighting"
+        user.save
+        message = {
+          type: 'text',
+          text: "[状態：戦闘開始！]",
+          quickReply: BattleChoice.create_quick_reply_object
+        }
+        client.reply_message(events[0]['replyToken'], message)
+        binding.pry
+      elsif data_params == 'にげる'
+      end
 
-    postback_params = events[0]["postback"]
-    unless postback_params
-
-      text_params = events[0]["message"]["text"]
+    else
 
       if text_params =~ /戻る/
         user.status = "0"
@@ -34,7 +49,7 @@ class Replier
 
       status = user.status
 
-      if status == "天気"
+      if status == "whether"
         message = Whether.create_message_about_whether_in(text_params)
         client.reply_message(events[0]['replyToken'], message)
       end
@@ -51,7 +66,7 @@ class Replier
 
       if status == "0"
         if text_params =~ /天気/
-          user.status = "天気"
+          user.status = "whether"
           user.save
           message = {
             type: 'text',
@@ -89,21 +104,6 @@ class Replier
         end
         client.reply_message(events[0]['replyToken'], message)
       end
-    else
-      data_params = postback_params["data"]
-      if data_params == 'たたかう'
-        user.status = "fighting"
-        user.save
-        message = {
-          type: 'text',
-          text: "[状態：戦闘開始！]",
-          quickReply: BattleChoice.create_quick_reply_object
-        }
-        client.reply_message(events[0]['replyToken'], message)
-
-      elsif data_params == 'にげる'
-
-      end
     end
 
 
@@ -111,8 +111,8 @@ class Replier
 
   private
 
-  def client
-    client ||= Line::Bot::Client.new { |config|
+  def set_client
+    Line::Bot::Client.new { |config|
       config.channel_secret = ENV["LINE_CHANNEL_SECRET"]
       config.channel_token = ENV["LINE_CHANNEL_TOKEN"]
     }
@@ -132,27 +132,4 @@ class Replier
     end
     user
   end
-
-  def generate_analized_words_from(text)
-    arr = []
-    natto = Natto::MeCab.new
-    natto.parse(text) do |n|
-      arr << {n.surface => n.feature.split(",")}
-    end
-    arr
-  end
-
-  def extract_region_word_from(text_array)
-    region_arr = []
-
-    text_array.each do |hash|
-      hash.each do |k, v|
-        if v[2] == "地域"
-          region_arr << k
-        end
-      end
-    end
-    region_arr
-  end
-
 end

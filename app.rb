@@ -34,7 +34,7 @@ post '/callback' do
     error 400 do 'Bad Request' end
   end
 
-  replier.reply_message_according_to(replier.request_body)
+  replier.reply_message
   'OK'
 end
 
