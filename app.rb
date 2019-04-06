@@ -27,6 +27,7 @@ post '/callback' do
   load "./model/whether.rb"
   load "./model/news.rb"
   load "./model/battle_choice.rb"
+  load "./model/brain.rb"
 
   replier = Replier.new(request)
 
@@ -34,29 +35,19 @@ post '/callback' do
     error 400 do 'Bad Request' end
   end
 
-  replier.reply_message_according_to(replier.request_body)
+  brain = Brain.new(user: replier.user,
+                    events: replier.events)
+  message = brain.delegate_to_class_to_create_message
+  replier.reply(message)
+  # replier.reply_message
   'OK'
 end
 
 get '/whether' do
 
-  word = "東京と大阪では静岡形態素解析を旭川と行った研究は当たり前だよ。ニューヨーク"
-  arr = []
-
-  natto = Natto::MeCab.new
-  natto.parse(word) do |n|
-    arr << {n.surface => n.feature.split(",")}
-  end
-
-  region_arr = []
-
-  arr.each do |hash|
-    hash.each do |k, v|
-      if v[2] == "地域"
-        word << k
-      end
-    end
-  end
-  region_arr
+  load "./model/brain.rb"
+  brain = Brain.new("こんにちは、明日の大阪はどんな日になるだろう")
+  word = brain.generate_analized_array_words
+  word.inspect
 
 end
