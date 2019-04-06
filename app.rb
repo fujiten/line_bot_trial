@@ -27,6 +27,7 @@ post '/callback' do
   load "./model/whether.rb"
   load "./model/news.rb"
   load "./model/battle_choice.rb"
+  load "./model/brain.rb"
 
   replier = Replier.new(request)
 
@@ -34,7 +35,11 @@ post '/callback' do
     error 400 do 'Bad Request' end
   end
 
-  replier.reply_message
+  brain = Brain.new(user: replier.user,
+                    events: replier.events)
+  message = brain.delegate_to_class_to_create_message
+  replier.reply(message)
+  # replier.reply_message
   'OK'
 end
 

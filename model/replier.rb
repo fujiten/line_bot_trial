@@ -17,6 +17,10 @@ class Replier
     client.validate_signature(request_body, signature)
   end
 
+  def reply(message)
+    client.reply_message(events[0]['replyToken'], message)
+  end
+
   def reply_message
 
     if postback_params
@@ -50,7 +54,8 @@ class Replier
       status = user.status
 
       if status == "whether"
-        message = Whether.create_message_about_whether_in(text_params)
+        whether = Whether.new(text_params)
+        message = whether.create_message
         client.reply_message(events[0]['replyToken'], message)
       end
 
@@ -132,4 +137,6 @@ class Replier
     end
     user
   end
+
+
 end
