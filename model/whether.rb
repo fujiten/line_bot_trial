@@ -17,7 +17,7 @@ class Whether
     if region_arr.empty?
       message = {
         type: 'text',
-        text: "[状態：天気検索]\n「大阪」みたいに地域名を教えてほしいんだ。興味ないなら「戻る」って言ってね。"
+        text: "[状態：天気検索]\n「東京」みたいに地域名を入力してください。興味ないなら「戻る」って言ってね。"
       }
     elsif region_arr.length > 1
       message = {
