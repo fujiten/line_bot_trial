@@ -28,6 +28,7 @@ post '/callback' do
   load "./model/news.rb"
   load "./model/battle_choice.rb"
   load "./model/brain.rb"
+  load "./model/fight.rb"
 
   replier = Replier.new(request)
 
@@ -37,6 +38,7 @@ post '/callback' do
 
   brain = Brain.new(user: replier.user,
                     events: replier.events)
+  brain.set_user_status
   message = brain.delegate_to_class_to_create_message
   replier.reply(message)
   # replier.reply_message
