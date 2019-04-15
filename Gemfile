@@ -1,5 +1,6 @@
 source "https://rubygems.org"
 
+gem 'ruby' '2.5.1'
 gem 'sinatra'
 gem 'sinatra-reloader'
 gem "sinatra-activerecord"
