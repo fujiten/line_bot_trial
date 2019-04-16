@@ -48,8 +48,12 @@ end
 get '/whether' do
 
   load "./model/brain.rb"
-  brain = Brain.new("こんにちは、明日の大阪はどんな日になるだろう")
-  word = brain.generate_analized_array_words
-  word.inspect
+  text_params = "こんにちは、明日の大阪はどんな日になるだろう"
+  arr = []
+  natto = Natto::MeCab.new
+  natto.parse(text_params) do |n|
+    arr << {n.surface => n.feature.split(",")}
+  end
+  arr.inspect
 
 end
